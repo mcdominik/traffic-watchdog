@@ -1,5 +1,8 @@
 FROM python:3.10-alpine AS builder
 
+ENV CHAT_ID=
+ENV BOT_TOKEN=
+
 RUN apk add --no-cache gcc musl-dev libffi-dev
 
 WORKDIR /app
