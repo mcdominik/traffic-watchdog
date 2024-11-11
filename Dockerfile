@@ -2,7 +2,7 @@ FROM python:3.10-alpine AS builder
 
 ENV CHAT_ID=
 ENV BOT_TOKEN=
-
+ENV LINES_T0_TRACK=
 RUN apk add --no-cache gcc musl-dev libffi-dev
 
 WORKDIR /app

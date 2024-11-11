@@ -1,10 +1,16 @@
+import os
 import asyncio
 import logging
+
+from dotenv import load_dotenv
 
 from utils.telegram_wrapper import TelegramWrapper
 from utils.impediments_fetcher import ImpedimentsFetcher
 from utils.impediment import Impediment
 
+load_dotenv()
+
+LINES_TO_TRACK = os.getenv('LINES_TO_TRACK', '*').split(",")
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,9 +30,11 @@ class App:
         self.known_impediments: set[Impediment] = set()
 
     async def run(self, lines_to_track: tuple[str]) -> None:
-        logging.info(f'Stated tracking: {lines_to_track}')
+        logging.info(f'Started tracking: {lines_to_track}')
+        await self.telegram.send_message(f'Started tracking: {lines_to_track}')
+
         while True:
-            if lines_to_track == ['all']:
+            if lines_to_track == ['*']:
                 new_impediments = self.manager.get_all_impediments()
             else:
                 new_impediments = self.manager.get_custom_impediments(lines_to_track)
@@ -43,4 +51,4 @@ class App:
 
 
 watchdog = App()
-asyncio.run(watchdog.run(['24', '23', '20', 'M1', 'M2', '186', 'R80']))
+asyncio.run(watchdog.run(LINES_TO_TRACK))
