@@ -5,8 +5,8 @@ import logging
 from dotenv import load_dotenv
 
 from utils.telegram_wrapper import TelegramWrapper
-from utils.impediments_fetcher import ImpedimentsFetcher
-from utils.impediment import Impediment
+from impediments_tracker.impediments_fetcher import ImpedimentsFetcher
+from impediments_tracker.impediment import Impediment
 
 load_dotenv()
 

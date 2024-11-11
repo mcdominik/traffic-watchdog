@@ -5,7 +5,7 @@ from typing import Optional
 import requests
 import xmltodict
 
-from utils.impediment import Impediment
+from impediments_tracker.impediment import Impediment
 
 
 logging.basicConfig(level=logging.INFO,

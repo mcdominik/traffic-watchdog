@@ -1,7 +1,8 @@
 from typing import Optional
-from utils.city import City
-from utils.impediment import Impediment
-from utils.warsaw_scrapper import WarsawScrapper
+
+from impediments_tracker.city import City
+from impediments_tracker.impediment import Impediment
+from impediments_tracker.warsaw_scrapper import WarsawScrapper
 
 
 class ImpedimentsFetcher:
