@@ -33,11 +33,11 @@ class WarsawScrapper:
                 response of has changed. If so, {self.__repr__} needs update)''')
 
     @staticmethod
-    def try_find_line_in_title(title: str) -> list[Optional[str]]:
+    def try_find_line_in_title(title: str) -> tuple[Optional[str]]:
         # matches DDD, DD, D, LD, L-D, LDD
         pattern = r"\b(?:[A-Z]-\d|\d{1,3}|[A-Z]\d{1,2})\b"
         matches = re.findall(pattern, title)
-        return matches
+        return tuple(matches)
 
     def get_all_impediments(self) -> list[Optional[Impediment]]:
         raw_impediments = self.__fetch_raw_impediments()
@@ -56,10 +56,6 @@ class WarsawScrapper:
 
         return impediments
 
-    def get_custom_impediments(self, lines_to_track: list[Optional[str]]) -> list[Optional[Impediment]]:
+    def get_custom_impediments(self, lines_to_track: tuple[Optional[str]]) -> list[Optional[Impediment]]:
         all_impediments = self.get_all_impediments()
         return [impediment for impediment in all_impediments if set(impediment.lines) & set(lines_to_track)]
-
-    # def get_metro_impediments(self):
-    #     all_impediments = self.get_all_impediments()
-    #     return [impediment for impediment in all_impediments if impediment.vehicle == Vehicle.METRO.value]

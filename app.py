@@ -23,13 +23,13 @@ class App:
         self.telegram = TelegramWrapper()
         self.known_impediments: set[Impediment] = set()
 
-    async def run(self, lines_to_track: list[str]) -> None:
+    async def run(self, lines_to_track: tuple[str]) -> None:
         logging.info(f'Stated tracking: {lines_to_track}')
         while True:
             if lines_to_track == ['all']:
                 new_impediments = self.manager.get_all_impediments()
             else:
-                new_impediments = self.manager.get_custom_impediments()
+                new_impediments = self.manager.get_custom_impediments(lines_to_track)
             logger.info('Warsaw Impediments Fetched')
             if new_impediments:
                 for new_impediment in new_impediments:
@@ -43,4 +43,4 @@ class App:
 
 
 watchdog = App()
-asyncio.run(watchdog.run(['all']))
+asyncio.run(watchdog.run(['24', '23', '20', 'M1', 'M2', '186', 'R80']))

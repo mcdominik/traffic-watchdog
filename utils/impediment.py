@@ -8,4 +8,4 @@ class Impediment:
     description: str
     pub_date: str
     url_with_details: Optional[str]
-    lines: list[Optional[str]]
+    lines: tuple[Optional[str]]
