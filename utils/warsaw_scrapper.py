@@ -1,16 +1,20 @@
+import logging
+import re
 from typing import Optional
-import requests
 
+import requests
 import xmltodict
 
 from utils.impediment import Impediment
-from utils.vehicle import Vehicle
+
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class WarsawScrapper:
     def __init__(self):
         self.FEED_URL = 'https://www.wtp.waw.pl/feed/?post_type=impediment'
-        self.known_metro_lines = ['M1', 'M2']
 
     def __repr__(self):
         return 'Warsaw Scrapper'
@@ -24,49 +28,38 @@ class WarsawScrapper:
             return items if isinstance(items, list) else [
                 items]
         except Exception as e:
-            print(
+            logging.error(
                 f'''Error while parsing: {e}. Probably website structure/API
                 response of has changed. If so, {self.__repr__} needs update)''')
 
-    def __get_line_from_title(self, title) -> str:
-        return title.rsplit(' ', 1)[-1]
-
-    def __map_line_to_vehicle(self, line: str) -> Vehicle:
-        if line in self.known_metro_lines:
-            return Vehicle.METRO.value
-        else:
-            raise ValueError(f"Unknown line: {line}")
+    @staticmethod
+    def try_find_line_in_title(title: str) -> list[Optional[str]]:
+        # matches DDD, DD, D, LD, L-D, LDD
+        pattern = r"\b(?:[A-Z]-\d|\d{1,3}|[A-Z]\d{1,2})\b"
+        matches = re.findall(pattern, title)
+        return matches
 
     def get_all_impediments(self) -> list[Optional[Impediment]]:
         raw_impediments = self.__fetch_raw_impediments()
         impediments = []
-        for raw_impediment in raw_impediments:
-            line = self.__get_line_from_title(
-                raw_impediment.get('title', ''),)
-            try:
-                vehicle = self.__map_line_to_vehicle(line)
-            except:
-                impediment = Impediment(
-                    title=raw_impediment.get('title', ''),
-                    description=raw_impediment.get('description', ''),
-                    pub_date=raw_impediment.get('pubDate', ''),
-                    url_with_details=raw_impediment.get(
-                        'guid', {}).get('#text'),
-                    vehicle='',
-                    line='')
-                impediments.append(impediment)
-                continue
 
+        for raw_impediment in raw_impediments:
+            lines = self.try_find_line_in_title(
+                raw_impediment.get('title', ''))
             impediment = Impediment(
                 title=raw_impediment.get('title', ''),
                 description=raw_impediment.get('description', ''),
                 pub_date=raw_impediment.get('pubDate', ''),
                 url_with_details=raw_impediment.get('guid', {}).get('#text'),
-                vehicle=vehicle,
-                line=line)
+                lines=lines)
             impediments.append(impediment)
+
         return impediments
 
-    def get_metro_impediments(self):
+    def get_custom_impediments(self, lines_to_track: list[Optional[str]]) -> list[Optional[Impediment]]:
         all_impediments = self.get_all_impediments()
-        return [impediment for impediment in all_impediments if impediment.vehicle == Vehicle.METRO.value]
+        return [impediment for impediment in all_impediments if set(impediment.lines) & set(lines_to_track)]
+
+    # def get_metro_impediments(self):
+    #     all_impediments = self.get_all_impediments()
+    #     return [impediment for impediment in all_impediments if impediment.vehicle == Vehicle.METRO.value]

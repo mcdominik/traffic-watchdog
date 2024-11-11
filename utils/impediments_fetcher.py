@@ -1,3 +1,4 @@
+from typing import Optional
 from utils.city import City
 from utils.warsaw_scrapper import WarsawScrapper
 
@@ -12,8 +13,8 @@ class ImpedimentsFetcher:
     def get_all_impediments(self):
         return self.scrapper.get_all_impediments()
 
-    def get_metro_impediments(self):
-        return self.scrapper.get_metro_impediments()
+    def get_custom_impediments(self, lines_to_track: list[Optional[str]]):
+        return self.scrapper.get_custom_impediments(lines_to_track)
 
     def are_any_impediments(self):
         return bool(self.get_all_impediments())
